@@ -82,19 +82,19 @@ const Index = () => {
       </motion.p>
       
       <motion.div 
-        className="mt-12 flex flex-col md:flex-row gap-4"
+        className="mt-12 flex flex-col md:flex-row gap-4 justify-center items-center"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.8 }}
       >
         <Link to="/today">
           <motion.button 
-            className="px-8 py-3 rounded-full bg-slate-100/20 hover:bg-slate-100/50 backdrop-blur-xs text-space-cream  font-medium flex items-center gap-2 transition-all relative overflow-hidden group"
+            className="px-8 py-3 rounded-full bg-slate-200/10 hover:bg-slate-100/10 backdrop-blur-xs border border-space-silver/30 hover:border-white/20 text-space-cream  font-medium flex items-center gap-2 transition-all relative overflow-hidden group"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
           >
             <motion.span
-              className="absolute inset-0 bg-space-amber/50 z-0"
+              className="absolute inset-0 bg-space-silver/50 z-0"
               initial={{ x: "-100%" }}
               whileHover={{ x: "100%" }}
               transition={{ duration: 0.4 }}
@@ -112,16 +112,16 @@ const Index = () => {
         </Link>
         
         <Link to="/your-moon">
-          <motion.button 
-            className="px-8 py-3 rounded-full bg-transparent border border-space-cream/30 hover:border-space-cream/60 text-space-cream font-medium transition-all"
-            whileHover={{ scale: 1.05, borderColor: "rgba(255, 215, 0, 0.5)" }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="flex items-center">
-              <Moon className="w-4 h-4 mr-2" /> Find Your Birth Moon
-            </span>
-          </motion.button>
-        </Link>
+                  <motion.button 
+                    className="px-8 py-3 rounded-full bg-transparent border border-space-silver/30 hover:border-white/20 text-space-silver font-medium transition-all"
+                    whileHover={{ scale: 1.05, borderColor: "rgba(147, 129, 255, 0.5)" }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="flex items-center">
+                      <Moon className="w-4 h-4 mr-2" /> Find Your Birth Moon
+                    </span>
+                  </motion.button>
+                </Link>
       </motion.div>
     </div>
   );
