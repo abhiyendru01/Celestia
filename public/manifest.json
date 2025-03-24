@@ -1,0 +1,25 @@
+
+{
+  "name": "What's Your Moon",
+  "short_name": "Your Moon",
+  "description": "Explore moon phases, discover your birth moon, and learn lunar cycles",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111",
+  "theme_color": "#111",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/moonicon.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/moonicon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
