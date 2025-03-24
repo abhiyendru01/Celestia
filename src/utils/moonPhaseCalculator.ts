@@ -1,10 +1,9 @@
-// Moon phase calculation logic
+const NOAA_API_URL = "https://api.weather.gov/points";
+const OPEN_METEO_API_URL = "https://api.open-meteo.com/v1/forecast";
 
-// Lunar months are 29.53 days long
+// Constants for moon calculations
 const LUNAR_MONTH = 29.53;
-
-// Calendar with known new moon date to calculate from
-const KNOWN_NEW_MOON = new Date('2000-01-06').getTime();
+const KNOWN_NEW_MOON = new Date("2000-01-06T18:14:00Z").getTime(); 
 
 export type MoonPhase = {
   name: string;
@@ -101,137 +100,71 @@ export const moonPhases: MoonPhase[] = [
 ];
 
 // This function fetches moon phase data from Open Meteo API
-export async function fetchMoonPhaseFromOpenMeteo(date: Date): Promise<MoonPhase | null> {
+export async function fetchMoonPhaseFromNASA(date: Date): Promise<MoonPhase | null> {
   try {
     // Format date for API request (YYYY-MM-DD)
     const formattedDate = date.toISOString().split('T')[0];
-    
-    // Get yesterday's date for showing yesterday's moon phase on current day
-    const yesterday = new Date(date);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayFormatted = yesterday.toISOString().split('T')[0];
-    
-    // Open Meteo API endpoint for astronomical data
+
+    // NASA API URL for moon phase data (you need an API key)
+    const apiKey = import.meta.env.NASA_API_KEY; // Replace with your NASA API key
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&daily=moon_phase&timezone=auto&start_date=${yesterdayFormatted}&end_date=${formattedDate}`
+      `https://ssd-api.jpl.nasa.gov/sbdb.api?sstr=moon&cad=1&date=${formattedDate}&api_key=${apiKey}`
     );
-    
+
     if (!response.ok) {
-      console.error('Failed to fetch from Open Meteo API:', await response.text());
+      console.error("Failed to fetch from NASA API:", await response.text());
       return fallbackCalculation(date);
     }
-    
+
     const data = await response.json();
-    
-    if (!data.daily || !data.daily.moon_phase || !data.daily.moon_phase.length) {
-      console.error('Invalid data structure from Open Meteo API:', data);
+
+    if (!data || !data.phase) {
+      console.error("Invalid data structure from NASA API:", data);
       return fallbackCalculation(date);
     }
-    
-    // Get yesterday's moon phase value (0-1)
-    const moonPhaseValue = data.daily.moon_phase[0];
-    
-    // Map Open Meteo moon phase value to our moon phases
-    // Open Meteo: 0 = new moon, 0.25 = first quarter, 0.5 = full moon, 0.75 = last quarter
+
+    // Extract moon phase value (assuming API returns 0-1 range)
+    const moonPhaseValue = data.phase;
+
+    // Map NASA's moon phase value to our moon phases
     let phaseIndex;
-    
-    // March 23, 2025 correction - should be Waning Crescent
-    if (date.getFullYear() === 2025 && date.getMonth() === 2 && date.getDate() === 23) {
-      phaseIndex = 7; // Waning Crescent
-    } 
-    // September 10, 2003 was a Full Moon
-    else if (date.getFullYear() === 2003 && date.getMonth() === 8 && date.getDate() === 10) {
-      phaseIndex = 4; // Full Moon
-    }
-    // Map Open Meteo value to our phases
-    else {
-      if (moonPhaseValue >= 0 && moonPhaseValue < 0.125) phaseIndex = 0; // New Moon
-      else if (moonPhaseValue >= 0.125 && moonPhaseValue < 0.25) phaseIndex = 1; // Waxing Crescent
-      else if (moonPhaseValue >= 0.25 && moonPhaseValue < 0.375) phaseIndex = 2; // First Quarter
-      else if (moonPhaseValue >= 0.375 && moonPhaseValue < 0.5) phaseIndex = 3; // Waxing Gibbous
-      else if (moonPhaseValue >= 0.5 && moonPhaseValue < 0.625) phaseIndex = 4; // Full Moon
-      else if (moonPhaseValue >= 0.625 && moonPhaseValue < 0.75) phaseIndex = 5; // Waning Gibbous
-      else if (moonPhaseValue >= 0.75 && moonPhaseValue < 0.875) phaseIndex = 6; // Last Quarter
-      else phaseIndex = 7; // Waning Crescent
-    }
-    
+    if (moonPhaseValue >= 0 && moonPhaseValue < 0.125) phaseIndex = 0; // New Moon
+    else if (moonPhaseValue >= 0.125 && moonPhaseValue < 0.25) phaseIndex = 1; // Waxing Crescent
+    else if (moonPhaseValue >= 0.25 && moonPhaseValue < 0.375) phaseIndex = 2; // First Quarter
+    else if (moonPhaseValue >= 0.375 && moonPhaseValue < 0.5) phaseIndex = 3; // Waxing Gibbous
+    else if (moonPhaseValue >= 0.5 && moonPhaseValue < 0.625) phaseIndex = 4; // Full Moon
+    else if (moonPhaseValue >= 0.625 && moonPhaseValue < 0.75) phaseIndex = 5; // Waning Gibbous
+    else if (moonPhaseValue >= 0.75 && moonPhaseValue < 0.875) phaseIndex = 6; // Last Quarter
+    else phaseIndex = 7; // Waning Crescent
+
     // Get a copy of the moon phase to avoid modifying the original
     const moonPhase = { ...moonPhases[phaseIndex] };
-    
+
     // Calculate moon age based on phase value (0-29.53 days)
     moonPhase.moonAge = parseFloat((moonPhaseValue * LUNAR_MONTH).toFixed(1));
-    
+
     // Calculate illumination
-    if (moonPhaseValue <= 0.5) {
-      // Waxing phase (0-50%)
-      moonPhase.illumination = moonPhaseValue * 2;
-    } else {
-      // Waning phase (50-0%)
-      moonPhase.illumination = (1 - moonPhaseValue) * 2;
-    }
-    
+    moonPhase.illumination = moonPhaseValue <= 0.5 ? moonPhaseValue * 2 : (1 - moonPhaseValue) * 2;
+
     return moonPhase;
   } catch (error) {
-    console.error('Error fetching Open Meteo moon data:', error);
+    console.error("Error fetching NASA moon data:", error);
     return fallbackCalculation(date);
   }
 }
 
 // Fallback calculation if API fails
 function fallbackCalculation(date: Date): MoonPhase {
-  // Handle special dates
-  // March 23, 2025 is a Waning Crescent moon
-  if (date.getFullYear() === 2025 && date.getMonth() === 2 && date.getDate() === 23) {
-    const waningCrescent = { ...moonPhases[7] }; // Waning Crescent
-    waningCrescent.illumination = 0.15; // Low illumination for waning crescent
-    waningCrescent.moonAge = 26;
-    return waningCrescent;
-  }
-  
-  // September 10, 2003 was a Full Moon
-  if (date.getFullYear() === 2003 && date.getMonth() === 8 && date.getDate() === 10) {
-    const fullMoon = { ...moonPhases[4] }; // Full Moon
-    fullMoon.illumination = 0.98; // Nearly full illumination
-    fullMoon.moonAge = 14;
-    return fullMoon;
-  }
-  
-  // Get yesterday's date
   const yesterday = new Date(date);
   yesterday.setDate(yesterday.getDate() - 1);
-  
-  // Calculate how many days since the known new moon for yesterday
   const daysSinceNewMoon = (yesterday.getTime() - KNOWN_NEW_MOON) / (1000 * 60 * 60 * 24);
-  
-  // Calculate the current phase as a fraction (0 to 1)
   const phase = (daysSinceNewMoon % LUNAR_MONTH) / LUNAR_MONTH;
-  
-  // Determine the moon age in days (0-29.53)
   const moonAge = (phase * LUNAR_MONTH).toFixed(1);
-  
-  // Determine the phase index based on the phase value
   const phaseIndex = Math.floor((phase * 8) % 8);
-  
-  // Get a copy of the moon phase to avoid modifying the original
   const moonPhase = { ...moonPhases[phaseIndex] };
-  
-  // Update with calculated moon age and actual illumination
   moonPhase.moonAge = parseFloat(moonAge);
-  
-  // Calculate actual illumination percentage (0-100%)
-  if (phase <= 0.5) {
-    // Waxing phase (0-50%)
-    moonPhase.illumination = phase * 2;
-  } else {
-    // Waning phase (50-0%)
-    moonPhase.illumination = (1 - phase) * 2;
-  }
-  
+  moonPhase.illumination = phase <= 0.5 ? phase * 2 : (1 - phase) * 2;
   return moonPhase;
-}
-
-export async function calculateMoonPhaseFromNASA(date: Date): Promise<MoonPhase | null> {
-  return fetchMoonPhaseFromOpenMeteo(date);
 }
 
 export function calculateMoonPhase(date: Date): MoonPhase {
@@ -241,39 +174,29 @@ export function calculateMoonPhase(date: Date): MoonPhase {
 }
 
 export function calculateMoonriseAndMoonset(date: Date): { moonrise: string, moonset: string } {
-  // This is a simplified approximation - in a real app, you would use an astronomical 
-  // calculation library or API for precise times based on location
-  
-  // For demo purposes, generate random but plausible times
   const phase = calculateMoonPhase(date);
-  
-  // Get base time that changes with the phase
   let baseRiseHour = (phase.illumination * 24) % 12;
   baseRiseHour = Math.round(baseRiseHour);
   if (baseRiseHour === 0) baseRiseHour = 12;
-  
   let baseSetHour = (baseRiseHour + 12) % 12;
   if (baseSetHour === 0) baseSetHour = 12;
-  
   const riseMinute = Math.floor(Math.random() * 60);
   const setMinute = Math.floor(Math.random() * 60);
-  
-  const risePeriod = baseRiseHour >= 7 && baseRiseHour <= 18 ? 'AM' : 'PM';
-  const setPeriod = baseSetHour >= 7 && baseSetHour <= 18 ? 'AM' : 'PM';
-  
+  const risePeriod = baseRiseHour >= 7 && baseRiseHour <= 18 ? "AM" : "PM";
+  const setPeriod = baseSetHour >= 7 && baseSetHour <= 18 ? "AM" : "PM";
+
   const formatTime = (hour: number, minute: number, period: string) => {
-    return `${hour}:${minute.toString().padStart(2, '0')} ${period}`;
+    return `${hour}:${minute.toString().padStart(2, "0")} ${period}`;
   };
-  
+
   return {
     moonrise: formatTime(baseRiseHour, riseMinute, risePeriod),
-    moonset: formatTime(baseSetHour, setMinute, setPeriod)
+    moonset: formatTime(baseSetHour, setMinute, setPeriod),
   };
 }
 
 export function getMoonPhaseImage(phase: MoonPhase): string {
-  // Generate the path to the moon phase image
-  const imageName = phase.name.toLowerCase().replace(/\s+/g, '-');
+  const imageName = phase.name.toLowerCase().replace(/\s+/g, "-");
   return `/images/moon-phases/${imageName}.png`;
 }
 
@@ -376,7 +299,7 @@ export async function fetchUpcomingSpaceEvents(): Promise<{
       relatedEvents: ["Excellent time for deep space observation"]
       },
       {
-      title: `${currentMonthName} International Space Station Visible`,
+      title: `International Space Station Visible`,
       date: new Date(currentYear, currentMonth, today.getDate() + 20).toISOString(),
       description: "The International Space Station will be clearly visible with the naked eye as it passes overhead. The ISS appears as a bright, fast-moving star across the night sky.",
       image: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1920&h=1200",

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { fetchMoonPhaseFromOpenMeteo, MoonPhase, calculateMoonriseAndMoonset, getHistoricalEvent, moonPhases } from '../utils/moonPhaseCalculator';
+import { fetchMoonPhaseFromNASA, MoonPhase, calculateMoonriseAndMoonset, getHistoricalEvent, moonPhases } from '../utils/moonPhaseCalculator';
 import { Calendar, Share, Moon, Clock, Info, Star, Heart, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ const YourMoon: React.FC = () => {
       }
       // For other dates use the API
       else {
-        phase = await fetchMoonPhaseFromOpenMeteo(date);
+        phase = await fetchMoonPhaseFromNASA(date);
       }
       
       if (!phase) {

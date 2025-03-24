@@ -5,8 +5,8 @@
   "description": "Explore moon phases, discover your birth moon, and learn lunar cycles",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111",
-  "theme_color": "#111",
+    "background_color": "#000000",
+    "theme_color": "#000000",
   "orientation": "portrait-primary",
   "icons": [
     {

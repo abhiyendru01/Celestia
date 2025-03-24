@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { fetchMoonPhaseFromOpenMeteo, calculateMoonriseAndMoonset } from '../utils/moonPhaseCalculator';
+import { fetchMoonPhaseFromNASA, calculateMoonriseAndMoonset } from '../utils/moonPhaseCalculator';
 import { Sunrise, Sunset, Info, Clock, Moon, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +35,7 @@ const TodaysMoon: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const phase = await fetchMoonPhaseFromOpenMeteo(new Date());
+        const phase = await fetchMoonPhaseFromNASA(new Date());
         if (phase) {
           setMoonPhase(phase);
         } else {
@@ -125,7 +125,7 @@ const TodaysMoon: React.FC = () => {
           <motion.div 
             className="w-full h-full moon-shadow" 
             style={{ 
-              backgroundImage: "url('/images/moon-full.webp')", 
+              backgroundImage: `url('/images/${moonPhase.name.toLowerCase().replace(/\s+/g, '-')}.png')`, 
               backgroundSize: "cover",
               filter: `brightness(${0.5 + moonPhase.illumination})`
             }}
@@ -219,16 +219,17 @@ const TodaysMoon: React.FC = () => {
             This moon is approximately {moonPhase.moonAge} days into its lunar cycle of 29.53 days.
           </p>
         </div>
-      </motion.div>
-      
-      <motion.p 
-        className="mt-8 text-space-cream/60 text-sm max-w-md text-center"
+        <motion.p 
+        className="mt-8 text-space-cream/60 text-sm max-w-md text-center font-serif"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7, duration: 0.5 }}
       >
         {moonPhase.description}
       </motion.p>
+      </motion.div>
+      
+     
     </div>
   );
 };
