@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Github, Twitter, ExternalLink, Heart, Star, Moon, Sparkles } from 'lucide-react';
+import { Github, Linkedin, ExternalLink, Heart, Star, Moon, Sparkles } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const socialLinks = [
-    { icon: <Github className="w-5 h-5" />, url: 'https://github.com', label: 'GitHub' },
-    { icon: <Twitter className="w-5 h-5" />, url: 'https://twitter.com', label: 'Twitter' },
+    { icon: <Github className="w-5 h-5" />, url: 'https://github.com/abhiyendru01', label: 'GitHub' },
+    { icon: <Linkedin className="w-5 h-5" />, url: 'https://linkedin.com/in/rahulr0644', label: 'Twitter' },
     { icon: <Star className="w-5 h-5" />, url: '#', label: 'Star' },
   ];
 
@@ -74,11 +74,11 @@ const Footer: React.FC = () => {
             className="text-center text-space-cream/50 text-xs flex items-center"
             whileHover={{ color: 'rgba(255, 250, 228, 0.8)' }}
           >
-            Made with 
+            created by abhiyendru
             <motion.span className="mx-1 text-space-cream">
               <Sparkles className="w-3 h-3" />
             </motion.span>
-            and cosmic energy
+            
           </motion.p>
         </motion.div>
       </div>

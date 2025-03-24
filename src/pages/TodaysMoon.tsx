@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { fetchMoonPhaseFromOpenMeteo, calculateMoonriseAndMoonset } from '../utils/moonPhaseCalculator';
@@ -8,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 const TodaysMoon: React.FC = () => {
-  // Initialize with null since we'll fetch the actual data
   interface MoonPhase {
     name: string;
     illumination: number;
@@ -26,9 +24,7 @@ const TodaysMoon: React.FC = () => {
 
   const [moonTimes, setMoonTimes] = useState<MoonTimes | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Format current date
+
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -38,9 +34,7 @@ const TodaysMoon: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        // Fetch moon phase from Open Meteo
         const phase = await fetchMoonPhaseFromOpenMeteo(new Date());
         if (phase) {
           setMoonPhase(phase);
@@ -48,21 +42,25 @@ const TodaysMoon: React.FC = () => {
           toast.error('Could not fetch moon phase data');
         }
         
-        // Calculate moon times
         const times = calculateMoonriseAndMoonset(new Date());
         setMoonTimes(times);
       } catch (error) {
         console.error('Error fetching moon data:', error);
         toast.error('Could not fetch moon data');
-      } finally {
-        setIsLoading(false);
       }
     };
     
     fetchData();
   }, []);
 
-  // Particle animation for the cosmic dust effect
+  if (!moonPhase || !moonTimes) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <p className="mt-4 text-space-cream/70">Moon data is unavailable.</p>
+      </div>
+    );
+  }
+
   const Particles = () => {
     return (
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -88,20 +86,6 @@ const TodaysMoon: React.FC = () => {
       </div>
     );
   };
-
-  // Loading state
-  if (isLoading || !moonPhase || !moonTimes) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh]">
-        <motion.div 
-          className="w-16 h-16 border-4 border-space-cream/20 border-t-space-cream rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-        />
-        <p className="mt-4 text-space-cream/70">Loading moon data...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center py-12 px-4 relative">

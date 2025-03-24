@@ -23,9 +23,9 @@
 - 📱 **Progressive Web App (PWA) support**  
 
 ## **Screenshots**
-<img src="https://github.com/user-attachments/assets/4c3cb6c2-bb6c-4d58-bf18-c4b68415d933" width="500">  
-<img src="https://github.com/user-attachments/assets/c2c4b33e-2fe7-4107-a281-1e2f33d1d9ef" width="500">  
-<img src="https://github.com/user-attachments/assets/112d4c40-5efd-4853-8b9c-af45bdc652b4" width="500">  
-<img src="https://github.com/user-attachments/assets/bd157628-b058-49ae-bc95-9c86eabae2d6" width="500">  
-<img src="https://github.com/user-attachments/assets/bd09bb18-d76b-4bbe-ba2d-e936061eb220" width="500">  
+<img src="https://github.com/user-attachments/assets/2f4300e4-2c19-4de9-9612-50692c856068" width="500">  
+<img src="https://github.com/user-attachments/assets/5a9bc783-1c5e-43ac-a4e4-24c5cdb9c0e6" width="500">  
+<img src="https://github.com/user-attachments/assets/85575929-e570-4c4f-95f6-0d5bd4ccbace" width="500">  
+<img src="https://github.com/user-attachments/assets/5a208bb1-3038-4744-bb2e-144a658701a9" width="500">  
+<img src="https://github.com/user-attachments/assets/6f2cbd87-56f7-4456-a227-7adc728eeb9e" width="500">  
 
